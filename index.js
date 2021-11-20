@@ -4,6 +4,7 @@ const Employee = require('./lib/Employee');
 const Manager = require('./lib/Manager');
 const Engineer = require('./lib/Engineer');
 const Intern = require('./lib/Intern');
+const getHtml = require('./src/html');
 
 let team = [];
 let response = {};
@@ -111,6 +112,8 @@ async function addEmployee() {
 
 }
 
+
+
 async function init() {
     await inquirer.prompt([
         {
@@ -140,6 +143,11 @@ async function init() {
     await addEmployee();
 
     console.log(team);
+    console.log(getHtml("hello"));
+
+    for (i=0; i < team.length; i++) {
+        console.log(team[i].getRole());
+    };
 
 }
 
