@@ -8,6 +8,7 @@ const getHtml = require('./src/html');
 
 let team = [];
 let response = {};
+let cardHtml = "";
 
 async function inqEngineer() {
     await inquirer.prompt([
@@ -70,7 +71,7 @@ async function addEmployee() {
         type: "list",
         name: "EmployeeType",
         message: "Which type of employee would you like to enter?",
-        choices: ['Engineer','Intern','Quit','Clear']
+        choices: ['Engineer','Intern','Done']
         }
     ]).then(function(data){
         response = data;
@@ -83,35 +84,70 @@ async function addEmployee() {
         case "Intern":
             await inqIntern();
             break;
-        case "Save":
-            break;
-        case "Clear":
-            team = [];
+        case "Done":
             break;
     }   
     
     process.stdout.write("\u001b[3J\u001b[2J\u001b[1J");
     console.clear();
     console.log(team);
-    //console.log(generateMarkdown(answers));
-
-    // if (response.EmployeeType === "Save") {
-    //     fs.writeFile("./dist/index.html", generateMarkdown(team), (err) => {
-    //         if (err)
-    //             console.log(err);
-    //         else {
-    //             console.log("File written successfully\n");
-    //             console.log(fs.readFileSync("./dist/index.html", "utf8"));
-    //         }
-    //     });
-    // }
-    if (response.EmployeeType != "Quit") {
+  
+    if (response.EmployeeType != "Done") {
         response = {};
         await addEmployee();
     }
 
 }
 
+function getAttribute(employee) {
+    if (employee.getTitle === "Manager") {
+        console.log(employee.officeNumber);
+        return `office number: ${employee.getOfficeNumber()}`;
+    }
+
+    if (employee.getTitle === "Intern") {
+        return `school: ${employee.getSchool()}`;
+    }
+
+    if (employee.getTitle === "Engineer") {
+        return `gitHub: ${employee.getGithub()}`;
+    }
+
+}
+
+function getCardHtml() {
+    cardHtml = '';
+    let empAttr = '';
+    for (i = 0; i < team.length; i++) {
+
+        switch (team[i].getRole()) {
+            case "Manager":
+                empAttr = 'Office Number: ' + team[i].getOfficeNumber();
+                break;
+            case "Engineer":
+                empAttr = 'GitHub: <a href="https://github.com/' + team[i].getGithub() +'" target="_blank">' + team[i].getGithub() + '</a>';
+                break;
+            case "Intern":
+                empAttr = 'School: ' + team[i].getSchool();
+                break;
+        }
+        
+        cardHtml += `<div class="card justify-content-center align-items-center" style="width: 18rem;">
+            <div class="col card-header">
+                <h4>${team[i].getName()}</h4>
+            </div>
+            <div class="col card-header">
+                <h4>${team[i].getRole()}</h4 >
+            </div >
+            <ul class="list-group list-group-flush text">
+                <li class="list-group-item">ID: ${team[i].getId()}</li>
+                <li class="list-group-item">Email: <a href="mailto:${team[i].getEmail()}">${team[i].getEmail()}</a></li>
+                <li class="list-group-item"> ${empAttr}</li>
+            </ul>
+        </div > `;
+    }
+    return cardHtml;
+}
 
 
 async function init() {
@@ -140,16 +176,22 @@ async function init() {
         team.push(new Manager(data.name, data.id, data.email, data.officeNumber));
     });
 
+    process.stdout.write("\u001b[3J\u001b[2J\u001b[1J");
+    console.clear();
+
     await addEmployee();
 
-    console.log(team);
-    console.log(getHtml("hello"));
-
-    for (i=0; i < team.length; i++) {
-        console.log(team[i].getRole());
-    };
+    fs.writeFile("./dist/index.html", getHtml(getCardHtml()), (err) => {
+        if (err)
+            console.log(err);
+        else {
+            console.log("File written successfully\n");
+            console.log(fs.readFileSync("./dist/index.html", "utf8"));
+        }
+    });
 
 }
 
 // Function call to initialize app
 init();
+
