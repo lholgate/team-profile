@@ -1,4 +1,4 @@
-
+//function to build the HTML code
 function getHtml(cardHtml){
 
     let html = `

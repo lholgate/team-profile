@@ -1,15 +1,18 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
+//load Class modules
 const Employee = require('./lib/Employee');
 const Manager = require('./lib/Manager');
 const Engineer = require('./lib/Engineer');
 const Intern = require('./lib/Intern');
+//load THML template
 const getHtml = require('./src/html');
 
 let team = [];
 let response = {};
 let cardHtml = "";
 
+//Function to query and save Engineer data
 async function inqEngineer() {
     await inquirer.prompt([
         {
@@ -33,11 +36,11 @@ async function inqEngineer() {
         message: "What is your Engineer's github account?"
         }
     ]).then(function(data){
-        console.log(data);
         team.push(new Engineer(data.name, data.id, data.email, data.github));
     });
 }
 
+//function to query and save Intern data
 async function inqIntern() {
     await inquirer.prompt([
         {
@@ -65,6 +68,7 @@ async function inqIntern() {
     });
 }
 
+// function to prompt if an Intern or Engineer will be added
 async function addEmployee() {
     await inquirer.prompt([
         {
@@ -88,33 +92,19 @@ async function addEmployee() {
             break;
     }   
     
+    // resets position on console and clears screen
     process.stdout.write("\u001b[3J\u001b[2J\u001b[1J");
     console.clear();
     console.log(team);
-  
+    
+    //If Manager is not done entering employees than loop
     if (response.EmployeeType != "Done") {
         response = {};
         await addEmployee();
     }
 
 }
-
-function getAttribute(employee) {
-    if (employee.getTitle === "Manager") {
-        console.log(employee.officeNumber);
-        return `office number: ${employee.getOfficeNumber()}`;
-    }
-
-    if (employee.getTitle === "Intern") {
-        return `school: ${employee.getSchool()}`;
-    }
-
-    if (employee.getTitle === "Engineer") {
-        return `gitHub: ${employee.getGithub()}`;
-    }
-
-}
-
+//functiont o build the card data for the HTML
 function getCardHtml() {
     cardHtml = '';
     let empAttr = '';
@@ -149,8 +139,12 @@ function getCardHtml() {
     return cardHtml;
 }
 
-
+//Function to initial the application and query Manager data
 async function init() {
+    // resets position on console and clears screen
+    process.stdout.write("\u001b[3J\u001b[2J\u001b[1J");
+    console.clear();
+
     await inquirer.prompt([
         {
         type: "input",
@@ -176,11 +170,14 @@ async function init() {
         team.push(new Manager(data.name, data.id, data.email, data.officeNumber));
     });
 
+    // resets position on console and clears screen
     process.stdout.write("\u001b[3J\u001b[2J\u001b[1J");
     console.clear();
+    console.log(team);
 
     await addEmployee();
 
+    //Build the HTLM file and write it to dist directory
     fs.writeFile("./dist/index.html", getHtml(getCardHtml()), (err) => {
         if (err)
             console.log(err);
