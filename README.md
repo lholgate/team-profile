@@ -10,6 +10,11 @@
 - [Questions](#questions) 
 ## Description 
 Allows a managers to enter the information oabout their employees and generates a simple web page to easily access the information. <br /> 
+
+![Team Profile](./dist/team-profile.png)
+
+(https://watch.screencastify.com/v/hP5TELHyL4QKuwc1iqwv "Presentation Video")
+
 ## Installation 
 run "npm install" after downloading form git repository <br /> 
 ## Usage 
